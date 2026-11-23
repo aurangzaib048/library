@@ -60,12 +60,13 @@ sbomify_token() {
     echo "$token"
 }
 
-# Check if a component already has an SBOM with this digest as version
-# Usage: sbomify_digest_exists <component_id> <digest>
+# Check if a component already has an SBOM with this version (the image
+# digest for docker/chainguard, the config version otherwise).
+# Usage: sbomify_version_exists <component_id> <version>
 # Returns: 0 if exists, 1 if not, 2 if sbomify could not be queried
-# (auth or network failure must not be mistaken for "new digest").
-sbomify_digest_exists() {
-    local component_id="$1" digest="$2"
+# (auth or network failure must not be mistaken for "new version").
+sbomify_version_exists() {
+    local component_id="$1" version="$2"
 
     local token sboms
     token=$(sbomify_token "$component_id") || return 2
@@ -74,7 +75,7 @@ sbomify_digest_exists() {
         log_error "Could not list SBOMs for component ${component_id}"
         return 2
     }
-    jq -e --arg d "$digest" 'any(.items[]?; .sbom.version == $d)' <<< "$sboms" > /dev/null 2>&1
+    jq -e --arg v "$version" 'any(.items[]?; .sbom.version == $v)' <<< "$sboms" > /dev/null 2>&1
 }
 
 # Remove old SBOMs for a component (keep only current digest)

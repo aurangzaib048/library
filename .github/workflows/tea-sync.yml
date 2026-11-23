@@ -2,8 +2,8 @@
 #
 # Runs hourly to detect when upstream images change without a version bump.
 # Triggers the SBOM builder for all docker/chainguard apps. The builder
-# itself handles deduplication via TEA hash lookup — if the augmented SBOM
-# is already published, the upload is skipped.
+# itself skips the upload when the component already has an SBOM for the
+# current image digest.
 
 name: TEA Sync
 
