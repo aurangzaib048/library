@@ -201,11 +201,11 @@ git push
 ```
 
 Merging the bump to `master` runs that app's workflow (`sbom-nginx.yml`), which fetches the SBOM and uploads it to
-sbomify. Only apps whose `config.yaml` changed are rebuilt. You can also run the pipeline locally with
-`SBOMIFY_TOKEN` set:
+sbomify. Only apps whose `config.yaml` changed are rebuilt. Locally you can run the same pipeline without the
+upload:
 
 ```bash
-./scripts/run.sh nginx
+./scripts/run.sh nginx --dry-run
 ```
 
 Most bumps don't need to be made by hand. `./scripts/check-updates.sh --verify --update` finds and applies them
@@ -398,19 +398,20 @@ Exit codes: `0` all current, `1` updates available (including unverified), `2` a
 |----------|-------------|---------|
 | `LOG_LEVEL` | Logging level: DEBUG, INFO, WARN, ERROR | `INFO` |
 | `DRY_RUN` | Run in dry-run mode | `false` |
-| `SBOMIFY_TOKEN` | sbomify API token for upload | - |
 | `GH_TOKEN` | GitHub token for API access | - |
 | `DOCKER_HUB_MIRROR` | Read-only Docker Hub mirror used by `check-updates.sh`; empty = Docker Hub directly | `mirror.gcr.io` |
 
 ## GitHub Actions
 
-### Secrets
+### Authentication (OIDC)
 
-Configure these secrets in your repository:
+No secrets are used. Uploads authenticate to sbomify with OIDC trusted publishing: the workflow (with
+`permissions: id-token: write`) exchanges a GitHub-issued token for a short-lived sbomify token scoped to one
+component. Every component in `apps/*/config.yaml` needs an OIDC binding for `sbomify/library` in sbomify
+(Component → Settings → Trusted Publishing). Without one, the upload fails with a 403.
 
-| Secret | Description | Required |
-|--------|-------------|----------|
-| `SBOMIFY_TOKEN` | sbomify API token for uploading SBOMs | For upload |
+Because OIDC only exists on GitHub Actions, uploads only happen there. `run.sh` without `--dry-run` refuses to run
+anywhere else.
 
 ### Manual Trigger
 

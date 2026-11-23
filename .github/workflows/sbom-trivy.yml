@@ -30,7 +30,6 @@ jobs:
     with:
       app: trivy
       dry_run: ${{ github.event.inputs.dry_run == 'true' }}
-    secrets: inherit
     permissions:
       id-token: write
       contents: read

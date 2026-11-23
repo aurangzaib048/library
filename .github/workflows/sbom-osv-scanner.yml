@@ -27,7 +27,6 @@ jobs:
     with:
       app: osv-scanner
       dry_run: ${{ github.event.inputs.dry_run == 'true' }}
-    secrets: inherit
     permissions:
       id-token: write
       contents: read
