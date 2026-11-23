@@ -278,33 +278,18 @@ process_app() {
     # -------------------------------------------------------------------------
     local should_upload=true
 
+    # Checked per component, not via TEA: a TEA PURL lookup resolves to the
+    # product release, which components sharing a repo (keycloak/keycloak-js)
+    # or a bundle product share, so the second one would never be uploaded.
     if ! is_dry_run; then
-        if [[ "$source_type" == "docker" || "$source_type" == "chainguard" ]]; then
-            # Check sbomify for existing digest
-            local rc=0
-            sbomify_digest_exists "$component_id" "$image_digest" || rc=$?
-            case "$rc" in
-                0) log_info "Digest already exists on sbomify, skipping upload"
-                   should_upload=false ;;
-                1) log_info "New digest, will upload" ;;
-                *) die "Could not query sbomify for $app (OIDC binding or API failure)" ;;
-            esac
-        else
-            # TEA check for github_release/lockfile
-            local purl tei result
-            purl=$(build_purl "$app")
-            if [[ -n "$purl" ]]; then
-                tei="urn:tei:purl:library.sbomify.com:${purl}"
-                log_debug "TEI: $tei"
-                result=$(uvx --from 'libtea[cli]' tea-cli inspect "$tei" --json 2>/dev/null || true)
-                if [[ -n "$result" && "$result" != "{}" && "$result" != "null" ]]; then
-                    log_info "Version already published on TEA, skipping upload"
-                    should_upload=false
-                else
-                    log_info "Version not found on TEA, will upload"
-                fi
-            fi
-        fi
+        local rc=0
+        sbomify_version_exists "$component_id" "$component_version" || rc=$?
+        case "$rc" in
+            0) log_info "Version ${component_version} already exists on sbomify, skipping upload"
+               should_upload=false ;;
+            1) log_info "New version ${component_version}, will upload" ;;
+            *) die "Could not query sbomify for $app (OIDC binding or API failure)" ;;
+        esac
     fi
 
     # -------------------------------------------------------------------------
@@ -375,7 +360,7 @@ check_tools() {
     require_cmd "yq" "Install with: brew install yq"
     require_cmd "jq" "Install with: brew install jq"
 
-    # Check uvx (needed for sbomify-action and tea-cli)
+    # Check uvx (needed for sbomify-action)
     if ! command -v uvx &>/dev/null; then
         die "Required command 'uvx' not found. Install with: pip install uv"
     fi
