@@ -15,14 +15,11 @@ the newest upstream release that has an SBOM, then running the pipeline for the 
 - `cosign` only if you run the `nginx` (Chainguard) pipeline
 - `export GH_TOKEN=$(gh auth token)` so GitHub lookups aren't rate limited
 
-**Docker Hub rate limit:** anonymous manifest pulls are capped at 100 per hour per IP. A full check needs about 2
-pulls per docker app (there are around 50), so it can run out of quota partway through. When that happens the
-affected apps show up as `(error)`, never as "up to date". To avoid it, either:
-
-- log in to Docker Hub first (`crane auth login index.docker.io -u <user> -p <token>`), or
-- set `DOCKER_HUB_MIRROR=mirror.gcr.io`. The mirror is read-only and content-addressed, but its tag list can be a few
-  days behind. If you use it, run the check again directly against Docker Hub once the quota resets, and take any
-  newer patch versions it finds.
+**Docker lookups use `mirror.gcr.io` by default.** It's faster than Docker Hub and not rate limited (anonymous
+Docker Hub allows 100 manifest pulls/hour, and a full check needs about 2 per docker app). The mirror is read-only and
+content-addressed, so tags and digests match Docker Hub exactly. Its tag list can lag upstream by a few days, so the
+newest patch may show up one run later. That's fine for a recurring job. To query Docker Hub directly, run with
+`DOCKER_HUB_MIRROR=` (empty). Lookup failures are reported as `(error)`, never as "up to date".
 
 ## 2. Audit
 

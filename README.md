@@ -367,8 +367,9 @@ For lockfile sources:
 # (docker attestation, release asset, or lockfile at the tag)
 ./scripts/check-updates.sh --verify --update
 
-# Use a read-only Docker Hub mirror to avoid anonymous pull rate limits
-DOCKER_HUB_MIRROR=mirror.gcr.io ./scripts/check-updates.sh --verify
+# Docker lookups go through mirror.gcr.io by default (fast, no Docker Hub rate limit).
+# Query Docker Hub directly instead (e.g. to catch tags the mirror hasn't picked up yet):
+DOCKER_HUB_MIRROR= ./scripts/check-updates.sh --verify
 ```
 
 How the latest version is picked for Docker sources:
@@ -389,7 +390,7 @@ Exit codes: `0` all current, `1` updates available (including unverified), `2` a
 | `DRY_RUN` | Run in dry-run mode | `false` |
 | `SBOMIFY_TOKEN` | sbomify API token for upload | - |
 | `GH_TOKEN` | GitHub token for API access | - |
-| `DOCKER_HUB_MIRROR` | Read-only Docker Hub mirror used by `check-updates.sh` (e.g. `mirror.gcr.io`) | - |
+| `DOCKER_HUB_MIRROR` | Read-only Docker Hub mirror used by `check-updates.sh`; empty = Docker Hub directly | `mirror.gcr.io` |
 
 ## GitHub Actions
 

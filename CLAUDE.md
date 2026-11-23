@@ -70,7 +70,7 @@ yamllint .
 - `DRY_RUN` — true/false
 - `SBOMIFY_TOKEN` — API token for sbomify upload
 - `GH_TOKEN` — GitHub API token
-- `DOCKER_HUB_MIRROR` — optional read-only Docker Hub mirror for `check-updates.sh` (e.g. `mirror.gcr.io`)
+- `DOCKER_HUB_MIRROR` — read-only Docker Hub mirror for `check-updates.sh` (default `mirror.gcr.io`; set empty for Docker Hub)
 
 ## Keeping the Library Current
 

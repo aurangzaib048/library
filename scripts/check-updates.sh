@@ -27,11 +27,13 @@ source "${SCRIPT_DIR}/lib/common.sh"
 
 MAX_PARALLEL=5
 
-# Optional read-through mirror for Docker Hub lookups, e.g. "mirror.gcr.io".
+# Read-through mirror for Docker Hub lookups (default: mirror.gcr.io).
 # Anonymous Docker Hub manifest pulls are rate limited (100/hour per IP), which
-# a full check can exhaust. Digests are content-addressed, so results are
-# identical to querying Docker Hub directly.
-DOCKER_HUB_MIRROR="${DOCKER_HUB_MIRROR:-}"
+# a full check exhausts; the mirror is faster and not throttled. Digests are
+# content-addressed, so whatever it returns is identical to Docker Hub, though
+# its tag list can lag upstream by a few days.
+# Set DOCKER_HUB_MIRROR="" to query Docker Hub directly.
+DOCKER_HUB_MIRROR="${DOCKER_HUB_MIRROR-mirror.gcr.io}"
 
 # =============================================================================
 # Argument Parsing
