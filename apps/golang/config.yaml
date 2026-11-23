@@ -1,5 +1,5 @@
 name: golang
-version: "1.26.0"
+version: "1.27.4"
 format: spdx
 
 source:

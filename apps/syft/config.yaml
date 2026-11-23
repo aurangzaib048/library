@@ -7,7 +7,7 @@
 # https://github.com/anchore/syft
 
 name: syft
-version: "1.39.0"
+version: "1.57.2"
 
 # cdxgen generates CycloneDX SBOMs from the Go lockfile
 format: cyclonedx

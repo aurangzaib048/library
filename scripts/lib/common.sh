@@ -16,6 +16,13 @@ APPS_DIR="${REPO_ROOT}/apps"
 SCRIPTS_DIR="${REPO_ROOT}/scripts"
 export REPO_ROOT APPS_DIR SCRIPTS_DIR
 
+# Prefer the crane/cosign installed from sbomify/sbom-tools by
+# scripts/install-tools.sh over whatever happens to be on PATH.
+if [[ -d "${REPO_ROOT}/.tools/bin" && ":${PATH}:" != *":${REPO_ROOT}/.tools/bin:"* ]]; then
+    PATH="${REPO_ROOT}/.tools/bin:${PATH}"
+    export PATH
+fi
+
 # Logging levels (numeric values for comparison)
 # DEBUG=0, INFO=1, WARN=2, ERROR=3
 LOG_LEVEL="${LOG_LEVEL:-INFO}"

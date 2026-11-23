@@ -1,5 +1,5 @@
 name: oraclelinux
-version: "9"
+version: "10"
 format: spdx
 source:
   type: docker

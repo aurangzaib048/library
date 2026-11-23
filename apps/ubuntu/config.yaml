@@ -1,5 +1,5 @@
 name: ubuntu
-version: "24.04"
+version: "26.04"
 format: spdx
 
 source:

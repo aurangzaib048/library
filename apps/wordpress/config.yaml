@@ -1,5 +1,5 @@
 name: wordpress
-version: "6.9.1"
+version: "7.1.5"
 format: spdx
 
 source:

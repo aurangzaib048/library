@@ -40,8 +40,12 @@ sbomify SBOM Library — automates Software Bill of Materials (SBOM) extraction 
 # Debug logging
 LOG_LEVEL=DEBUG ./scripts/run.sh <app-name>
 
-# Lint
-shellcheck scripts/**/*.sh
+# Check for (and apply) upstream version bumps; --verify skips versions without a published SBOM
+./scripts/check-updates.sh --verify
+./scripts/check-updates.sh --verify --update
+
+# Lint (matches CI)
+shellcheck -x -S warning scripts/*.sh scripts/*/*.sh
 yamllint .
 ```
 
@@ -66,7 +70,17 @@ yamllint .
 - `DRY_RUN` — true/false
 - `SBOMIFY_TOKEN` — API token for sbomify upload
 - `GH_TOKEN` — GitHub API token
+- `DOCKER_HUB_MIRROR` — read-only Docker Hub mirror for `check-updates.sh` (default `mirror.gcr.io`; set empty for Docker Hub)
+
+## Keeping the Library Current
+
+The maintenance routine (audit, bump, verify, PR) is documented as a skill in
+`.claude/skills/update-library/SKILL.md`. Follow it for any "update the library" task and keep it in sync with
+changes to `scripts/check-updates.sh`.
 
 ## Required Tools
 
-bash 4.0+, jq, yq, crane, cosign (for chainguard sources), git
+bash 4.0+, jq, yq, git, gh. crane and cosign come from [sbomify/sbom-tools](https://github.com/sbomify/sbom-tools)
+via `./scripts/install-tools.sh`. It is pinned in `.sbom-tools-version`, verified against build provenance, and
+installed into `.tools/bin`, which `scripts/lib/common.sh` adds to `PATH`. Don't install crane or cosign any other
+way, in CI or locally.
