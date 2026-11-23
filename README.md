@@ -132,12 +132,14 @@ Each SBOM is discoverable via the [Transparency Exchange API (TEA)](https://tc54
 ├── scripts/
 │   ├── fetch-sbom.sh                 # Main entry point
 │   ├── check-updates.sh              # Check for upstream version updates
+│   ├── install-tools.sh              # Install crane/cosign from sbomify/sbom-tools
 │   ├── lib/
 │   │   └── common.sh                 # Shared utilities
 │   └── sources/
 │       ├── docker-attestation.sh     # Docker extraction
 │       ├── github-release.sh         # GitHub release download
 │       └── lockfile-generator.sh     # Lockfile download
+├── .sbom-tools-version               # Pinned sbomify/sbom-tools release
 └── README.md
 ```
 
@@ -318,13 +320,19 @@ Note: SBOM generation from lockfiles is handled automatically by the sbomify Git
 - **jq** - JSON processor
 - **yq** - YAML processor
 
-For Docker sources:
-- **docker** with buildx, or
-- **crane** (from go-containerregistry), or
-- **oras**
+- **gh** - GitHub CLI, authenticated (used to download and verify the tools below)
 
-For Chainguard sources:
-- **cosign** (from sigstore)
+For Docker and Chainguard sources, **crane** and **cosign** come from
+[sbomify/sbom-tools](https://github.com/sbomify/sbom-tools), the same builds sbomify-action uses:
+
+```bash
+./scripts/install-tools.sh
+```
+
+This downloads the `sigstore` bundle for the release pinned in `.sbom-tools-version`, verifies its build provenance
+with `gh attestation verify`, and unpacks it into `.tools/bin`. The scripts in `scripts/` put `.tools/bin` on `PATH`
+themselves, so there is nothing else to configure. To use the tools in your own shell, run
+`eval "$(./scripts/install-tools.sh --env)"`. CI runs the same script.
 
 For lockfile sources:
 - No additional tools required (SBOM generation handled by sbomify GitHub Action)

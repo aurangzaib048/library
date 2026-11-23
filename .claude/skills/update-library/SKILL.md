@@ -11,9 +11,10 @@ the newest upstream release that has an SBOM, then running the pipeline for the 
 
 ## 1. Prerequisites
 
-- `bash` 4+, `git`, `jq`, `yq` (mikefarah v4), `crane`, `gh` (authenticated), `shellcheck`
-- `cosign` only if you run the `nginx` (Chainguard) pipeline
+- `bash` 4+, `git`, `jq`, `yq` (mikefarah v4), `gh` (authenticated), `shellcheck`
 - `export GH_TOKEN=$(gh auth token)` so GitHub lookups aren't rate limited
+- crane and cosign come from [sbomify/sbom-tools](https://github.com/sbomify/sbom-tools). Run
+  `./scripts/install-tools.sh` and don't install them any other way. The scripts pick up `.tools/bin` automatically.
 
 **Docker lookups use `mirror.gcr.io` by default.** It's faster than Docker Hub and not rate limited (anonymous
 Docker Hub allows 100 manifest pulls/hour, and a full check needs about 2 per docker app). The mirror is read-only and
@@ -38,6 +39,17 @@ Statuses:
 | `skipped` | `nginx` (Chainguard rolling `latest`) | Nothing to do. The `tea-sync` workflow picks up new digests |
 
 Exit codes: `0` all current, `1` updates or unverified, `2` errors.
+
+Also check the tool pin:
+
+```bash
+cat .sbom-tools-version
+gh release view --repo sbomify/sbom-tools --json tagName -q .tagName
+```
+
+If a newer sbom-tools release exists, write it to `.sbom-tools-version` and run `./scripts/install-tools.sh` (it
+must pass provenance verification). Then re-run the check and a chainguard fetch (`fetch-sbom.sh nginx`), so a new
+crane or cosign is proven against real registries before it ships.
 
 ## 3. Apply
 
@@ -87,7 +99,7 @@ yamllint .
 ## 7. Deliver
 
 - Branch from `master`. Commit with SSH signing. Name the branch after the change, e.g. `chore/bump-versions-YYYY-MM-DD`.
-- Use one PR per run. The PR body lists each `app: old → new`, calls out major bumps, and lists every
+- Use one PR per run. The PR body lists each `app: old → new` (and the sbom-tools bump, if any), calls out major bumps, and lists every
   `unverified` or `error` app with the reason.
 - The repo is public, so don't put internal tracker IDs, customer data or other confidential details in commits or
   the PR.

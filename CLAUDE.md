@@ -80,4 +80,7 @@ changes to `scripts/check-updates.sh`.
 
 ## Required Tools
 
-bash 4.0+, jq, yq, crane, cosign (for chainguard sources), git
+bash 4.0+, jq, yq, git, gh. crane and cosign come from [sbomify/sbom-tools](https://github.com/sbomify/sbom-tools)
+via `./scripts/install-tools.sh`. It is pinned in `.sbom-tools-version`, verified against build provenance, and
+installed into `.tools/bin`, which `scripts/lib/common.sh` adds to `PATH`. Don't install crane or cosign any other
+way, in CI or locally.

@@ -711,7 +711,7 @@ main() {
 
     # Check for source-type-specific tools
     if [[ -z "$FILTER_TYPE" || "$FILTER_TYPE" == "docker" ]]; then
-        require_cmd "crane" "Install with: go install github.com/google/go-containerregistry/cmd/crane@latest"
+        require_cmd "crane" "Install with: ./scripts/install-tools.sh"
     fi
 
     # Build app list

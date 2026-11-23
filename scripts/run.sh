@@ -392,10 +392,10 @@ check_tools() {
     done
 
     if [[ "$needs_crane" == true ]]; then
-        require_cmd "crane" "Install with: go install github.com/google/go-containerregistry/cmd/crane@latest"
+        require_cmd "crane" "Install with: ./scripts/install-tools.sh"
     fi
     if [[ "$needs_cosign" == true ]]; then
-        require_cmd "cosign" "Install from: https://github.com/sigstore/cosign"
+        require_cmd "cosign" "Install with: ./scripts/install-tools.sh"
     fi
 
     # Validate SBOMIFY_TOKEN for non-dry-run
