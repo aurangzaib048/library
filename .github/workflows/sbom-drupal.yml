@@ -9,6 +9,14 @@
 name: "SBOM: drupal"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/drupal/config.yaml'
+      - '.github/workflows/sbom-drupal.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:

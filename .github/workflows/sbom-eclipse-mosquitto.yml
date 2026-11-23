@@ -9,6 +9,14 @@
 name: "SBOM: eclipse-mosquitto"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/eclipse-mosquitto/config.yaml'
+      - '.github/workflows/sbom-eclipse-mosquitto.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:

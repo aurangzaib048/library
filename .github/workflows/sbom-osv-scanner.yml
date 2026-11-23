@@ -5,6 +5,14 @@
 name: "SBOM: osv-scanner"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/osv-scanner/config.yaml'
+      - '.github/workflows/sbom-osv-scanner.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:

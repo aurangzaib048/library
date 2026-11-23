@@ -9,6 +9,14 @@
 name: "SBOM: maven"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/maven/config.yaml'
+      - '.github/workflows/sbom-maven.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:

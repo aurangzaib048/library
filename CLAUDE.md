@@ -49,7 +49,8 @@ shellcheck -x -S warning scripts/*.sh scripts/*/*.sh
 yamllint .
 ```
 
-> **Note:** Per-app workflow triggers (`sbom-*.yml`) are disabled (dispatch-only). Use `run.sh` for local execution. The lint workflow remains active on PRs.
+> **Note:** Pushing to `master` runs `sbom-<app>.yml` for every app whose `config.yaml` (or workflow file) changed, so
+> merging a version bump uploads it. `run.sh` does the same locally. `ci.yml` and `tea-sync.yml` are dispatch-only.
 
 ## Adding a New App
 

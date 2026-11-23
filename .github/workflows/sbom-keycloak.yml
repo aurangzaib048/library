@@ -5,6 +5,14 @@
 name: "SBOM: keycloak"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/keycloak/config.yaml'
+      - '.github/workflows/sbom-keycloak.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:
