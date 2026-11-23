@@ -1,4 +1,8 @@
 # Reusable workflow for SBOM extraction and upload
+#
+# Takes no secrets: sbomify is authenticated with OIDC trusted publishing,
+# which needs `id-token: write` (granted by every caller) and an OIDC binding
+# for this repository on each component in sbomify.
 name: SBOM Builder
 
 on:
@@ -13,9 +17,6 @@ on:
         required: false
         type: boolean
         default: false
-    secrets:
-      SBOMIFY_TOKEN:
-        required: false
 
 env:
   YQ_VERSION: "v4.40.5"
@@ -194,7 +195,6 @@ jobs:
         with:
           component-purl: ${{ steps.digest.outputs.component_purl || steps.config.outputs.purl }}
         env:
-          TOKEN: ${{ secrets.SBOMIFY_TOKEN }}
           COMPONENT_ID: ${{ steps.config.outputs.component_id }}
           COMPONENT_NAME: ${{ steps.config.outputs.component_name }}
           COMPONENT_VERSION: ${{ steps.digest.outputs.image_digest || steps.config.outputs.version }}
@@ -210,7 +210,6 @@ jobs:
         with:
           component-purl: ${{ steps.config.outputs.purl }}
         env:
-          TOKEN: ${{ secrets.SBOMIFY_TOKEN }}
           COMPONENT_ID: ${{ steps.config.outputs.component_id }}
           COMPONENT_NAME: ${{ steps.config.outputs.component_name }}
           COMPONENT_VERSION: ${{ steps.config.outputs.version }}
@@ -257,17 +256,18 @@ jobs:
         run: |
           source scripts/lib/common.sh
           source scripts/lib/sbomify-api.sh
-          if sbomify_digest_exists \
-              "${{ steps.config.outputs.component_id }}" \
-              "${{ steps.digest.outputs.image_digest }}"; then
-            echo "Digest already exists, skipping upload"
-            echo "should_upload=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "New digest, will upload"
-            echo "should_upload=true" >> "$GITHUB_OUTPUT"
-          fi
-        env:
-          SBOMIFY_TOKEN: ${{ secrets.SBOMIFY_TOKEN }}
+          rc=0
+          sbomify_digest_exists \
+            "${{ steps.config.outputs.component_id }}" \
+            "${{ steps.digest.outputs.image_digest }}" || rc=$?
+          case "$rc" in
+            0) echo "Digest already exists, skipping upload"
+               echo "should_upload=false" >> "$GITHUB_OUTPUT" ;;
+            1) echo "New digest, will upload"
+               echo "should_upload=true" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::Could not query sbomify (OIDC binding or API failure)"
+               exit 1 ;;
+          esac
 
       - name: Resolve upload decision
         id: upload-decision
@@ -289,7 +289,6 @@ jobs:
         with:
           component-purl: ${{ steps.digest.outputs.component_purl || steps.config.outputs.purl }}
         env:
-          TOKEN: ${{ secrets.SBOMIFY_TOKEN }}
           COMPONENT_ID: ${{ steps.config.outputs.component_id }}
           COMPONENT_NAME: ${{ steps.config.outputs.component_name }}
           COMPONENT_VERSION: ${{ steps.digest.outputs.image_digest || steps.config.outputs.version }}
@@ -306,7 +305,6 @@ jobs:
         with:
           component-purl: ${{ steps.config.outputs.purl }}
         env:
-          TOKEN: ${{ secrets.SBOMIFY_TOKEN }}
           COMPONENT_ID: ${{ steps.config.outputs.component_id }}
           COMPONENT_NAME: ${{ steps.config.outputs.component_name }}
           COMPONENT_VERSION: ${{ steps.config.outputs.version }}
@@ -328,10 +326,9 @@ jobs:
             "${{ steps.digest.outputs.image_digest }}"
           if [[ -n "${{ steps.config.outputs.product_id }}" ]]; then
             sbomify_cleanup_versioned_releases \
-              "${{ steps.config.outputs.product_id }}"
+              "${{ steps.config.outputs.product_id }}" \
+              "${{ steps.config.outputs.component_id }}"
           fi
-        env:
-          SBOMIFY_TOKEN: ${{ secrets.SBOMIFY_TOKEN }}
 
       - name: Upload output artifact
         if: always()

@@ -50,7 +50,11 @@ yamllint .
 ```
 
 > **Note:** Pushing to `master` runs `sbom-<app>.yml` for every app whose `config.yaml` (or workflow file) changed, so
-> merging a version bump uploads it. `run.sh` does the same locally. `ci.yml` and `tea-sync.yml` are dispatch-only.
+> merging a version bump uploads it. `ci.yml` and `tea-sync.yml` are dispatch-only.
+>
+> **Auth is OIDC only.** There is no `SBOMIFY_TOKEN` or any other sbomify secret. Uploads exchange a GitHub Actions
+> OIDC token for a short-lived, component-scoped sbomify token (in sbomify-action and `scripts/lib/sbomify-api.sh`),
+> so they only work on GitHub Actions. Locally, use `run.sh --dry-run`. Don't reintroduce API tokens.
 
 ## Adding a New App
 
@@ -69,7 +73,6 @@ yamllint .
 
 - `LOG_LEVEL` — DEBUG, INFO, WARN, ERROR (default: INFO)
 - `DRY_RUN` — true/false
-- `SBOMIFY_TOKEN` — API token for sbomify upload
 - `GH_TOKEN` — GitHub API token
 - `DOCKER_HUB_MIRROR` — read-only Docker Hub mirror for `check-updates.sh` (default `mirror.gcr.io`; set empty for Docker Hub)
 

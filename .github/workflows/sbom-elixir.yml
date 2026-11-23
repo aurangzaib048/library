@@ -31,7 +31,6 @@ jobs:
     with:
       app: elixir
       dry_run: ${{ github.event.inputs.dry_run == 'true' }}
-    secrets: inherit
     permissions:
       id-token: write
       contents: read

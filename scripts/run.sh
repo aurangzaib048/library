@@ -245,7 +245,6 @@ process_app() {
     fi
 
     local sbomify_env=(
-        "TOKEN=${SBOMIFY_TOKEN:-}"
         "COMPONENT_ID=${component_id}"
         "COMPONENT_NAME=${component_name}"
         "COMPONENT_VERSION=${component_version}"
@@ -282,12 +281,14 @@ process_app() {
     if ! is_dry_run; then
         if [[ "$source_type" == "docker" || "$source_type" == "chainguard" ]]; then
             # Check sbomify for existing digest
-            if sbomify_digest_exists "$component_id" "$image_digest"; then
-                log_info "Digest already exists on sbomify, skipping upload"
-                should_upload=false
-            else
-                log_info "New digest, will upload"
-            fi
+            local rc=0
+            sbomify_digest_exists "$component_id" "$image_digest" || rc=$?
+            case "$rc" in
+                0) log_info "Digest already exists on sbomify, skipping upload"
+                   should_upload=false ;;
+                1) log_info "New digest, will upload" ;;
+                *) die "Could not query sbomify for $app (OIDC binding or API failure)" ;;
+            esac
         else
             # TEA check for github_release/lockfile
             local purl tei result
@@ -327,7 +328,6 @@ process_app() {
 
         log_info "Uploading SBOM..."
         local upload_env=(
-            "TOKEN=${SBOMIFY_TOKEN:-}"
             "COMPONENT_ID=${component_id}"
             "COMPONENT_NAME=${component_name}"
             "COMPONENT_VERSION=${component_version}"
@@ -357,7 +357,7 @@ process_app() {
             local product_id_cleanup
             product_id_cleanup=$(get_config "$app" ".sbomify.product_id" "")
             if [[ -n "$product_id_cleanup" ]]; then
-                sbomify_cleanup_versioned_releases "$product_id_cleanup"
+                sbomify_cleanup_versioned_releases "$product_id_cleanup" "$component_id"
             fi
         fi
     fi
@@ -398,9 +398,11 @@ check_tools() {
         require_cmd "cosign" "Install with: ./scripts/install-tools.sh"
     fi
 
-    # Validate SBOMIFY_TOKEN for non-dry-run
-    if ! is_dry_run && [[ -z "${SBOMIFY_TOKEN:-}" ]]; then
-        die "SBOMIFY_TOKEN is required for upload. Set it or use --dry-run."
+    # Uploads authenticate with OIDC trusted publishing, which only exists on
+    # GitHub Actions. Anywhere else, only --dry-run is possible.
+    if ! is_dry_run && ! sbomify_oidc_available; then
+        die "Uploading needs GitHub Actions OIDC (no API tokens are used). Run with --dry-run locally," \
+            "or merge the change and let sbom-<app>.yml upload it."
     fi
 }
 

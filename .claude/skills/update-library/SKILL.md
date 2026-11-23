@@ -104,7 +104,7 @@ yamllint .
 - The repo is public, so don't put internal tracker IDs, customer data or other confidential details in commits or
   the PR.
 - Don't upload anything yourself. Merging the PR to `master` runs `sbom-<app>.yml` for each bumped app, and that
-  workflow uploads the SBOM using the repository's `SBOMIFY_TOKEN` secret.
+  workflow uploads the SBOM. It authenticates with OIDC trusted publishing; there is no API token, so don't look for one.
 
 ## 8. Confirm the last bump uploaded
 
