@@ -9,6 +9,14 @@
 name: "SBOM: elixir"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/elixir/config.yaml'
+      - '.github/workflows/sbom-elixir.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:

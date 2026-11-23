@@ -9,6 +9,14 @@
 name: "SBOM: httpd"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/httpd/config.yaml'
+      - '.github/workflows/sbom-httpd.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:

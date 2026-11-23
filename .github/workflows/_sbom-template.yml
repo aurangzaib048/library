@@ -5,12 +5,22 @@
 # 2. Replace all occurrences of 'example-app' with your app name
 # 3. Commit and push
 #
-# The workflow will trigger on manual dispatch only.
-# Automatic triggers are disabled while using local run.sh.
+# The workflow will trigger when:
+# - The config.yaml is modified (including version bumps)
+# - The workflow file itself is modified
+# - It is dispatched manually
 
 name: "SBOM: example-app"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/example-app/config.yaml'
+      - '.github/workflows/_sbom-template.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:

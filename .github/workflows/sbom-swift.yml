@@ -9,6 +9,14 @@
 name: "SBOM: swift"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/swift/config.yaml'
+      - '.github/workflows/sbom-swift.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:

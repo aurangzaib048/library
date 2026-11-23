@@ -103,8 +103,24 @@ yamllint .
   `unverified` or `error` app with the reason.
 - The repo is public, so don't put internal tracker IDs, customer data or other confidential details in commits or
   the PR.
-- After the PR merges, run `./scripts/run.sh --app <comma-separated bumped apps>` (needs `SBOMIFY_TOKEN`) to upload.
-  The per-app workflows are dispatch-only.
+- Don't upload anything yourself. Merging the PR to `master` runs `sbom-<app>.yml` for each bumped app, and that
+  workflow uploads the SBOM using the repository's `SBOMIFY_TOKEN` secret.
+
+## 8. Confirm the last bump uploaded
+
+At the start of each run, before looking for new bumps, check the most recently merged bump PR. Every app it bumped
+should have a successful run of its workflow:
+
+```bash
+gh pr list --repo sbomify/library --state merged --limit 5 --json number,title,mergedAt,mergeCommit
+gh run list --repo sbomify/library --commit <merge commit sha> --json workflowName,conclusion,url
+```
+
+- Each run is `success`: nothing to do.
+- Any run failed: open its log (`gh run view <id> --repo sbomify/library --log-failed`) and report the app, the
+  version and the cause. If the cause is in this repo (config, scripts), fix it in this run's PR.
+- No run at all: the PR was merged without changing `apps/<app>/config.yaml` paths the workflow watches, or the
+  workflows were disabled. Report it. Don't work around it.
 
 ## Maintaining this skill
 

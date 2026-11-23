@@ -9,6 +9,14 @@
 name: "SBOM: influxdb"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/influxdb/config.yaml'
+      - '.github/workflows/sbom-influxdb.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:

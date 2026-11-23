@@ -200,7 +200,9 @@ git commit -m "Bump nginx to 1.26.0"
 git push
 ```
 
-Per-app workflow triggers are dispatch-only, so run the pipeline for the bumped app locally:
+Merging the bump to `master` runs that app's workflow (`sbom-nginx.yml`), which fetches the SBOM and uploads it to
+sbomify. Only apps whose `config.yaml` changed are rebuilt. You can also run the pipeline locally with
+`SBOMIFY_TOKEN` set:
 
 ```bash
 ./scripts/run.sh nginx

@@ -9,6 +9,14 @@
 name: "SBOM: php"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/php/config.yaml'
+      - '.github/workflows/sbom-php.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:

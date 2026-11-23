@@ -9,6 +9,14 @@
 name: "SBOM: erlang"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/erlang/config.yaml'
+      - '.github/workflows/sbom-erlang.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:

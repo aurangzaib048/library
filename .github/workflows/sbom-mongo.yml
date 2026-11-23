@@ -9,6 +9,14 @@
 name: "SBOM: mongo"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/mongo/config.yaml'
+      - '.github/workflows/sbom-mongo.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:

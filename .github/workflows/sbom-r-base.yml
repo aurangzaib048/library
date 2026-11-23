@@ -9,6 +9,14 @@
 name: "SBOM: r-base"
 
 on:
+  # Merging a version bump (or a change to this workflow) uploads the new SBOM
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/r-base/config.yaml'
+      - '.github/workflows/sbom-r-base.yml'
+
   workflow_dispatch:
     inputs:
       dry_run:
