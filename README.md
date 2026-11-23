@@ -198,7 +198,15 @@ git commit -m "Bump nginx to 1.26.0"
 git push
 ```
 
-The GitHub Action will automatically rebuild and upload only the nginx SBOM.
+Per-app workflow triggers are dispatch-only, so run the pipeline for the bumped app locally:
+
+```bash
+./scripts/run.sh nginx
+```
+
+Most bumps don't need to be made by hand. `./scripts/check-updates.sh --verify --update` finds and applies them
+(see [Checking for Updates](#checking-for-updates)), and `.claude/skills/update-library/SKILL.md` describes the
+full maintenance routine.
 
 ## Configuration Reference
 
@@ -354,7 +362,24 @@ For lockfile sources:
 
 # JSON output (for CI)
 ./scripts/check-updates.sh --json
+
+# Only report/apply versions whose SBOM actually exists upstream
+# (docker attestation, release asset, or lockfile at the tag)
+./scripts/check-updates.sh --verify --update
+
+# Use a read-only Docker Hub mirror to avoid anonymous pull rate limits
+DOCKER_HUB_MIRROR=mirror.gcr.io ./scripts/check-updates.sh --verify
 ```
+
+How the latest version is picked for Docker sources:
+
+1. Read the `org.opencontainers.image.version` annotation from the `:latest` tag.
+2. If it is less specific than the tracked version (`26` vs `25.0.0`, `1-trixie` vs `1.93.1`), or is a codename
+   (`trixie`), or the image has no `:latest` tag at all, list the tags and pick the highest one with the same shape as
+   the tracked version. When the annotation is numeric, the pick stays within that release line, so `26` resolves to
+   `26.x.y`.
+
+Exit codes: `0` all current, `1` updates available (including unverified), `2` at least one error.
 
 ### Environment Variables
 
@@ -364,6 +389,7 @@ For lockfile sources:
 | `DRY_RUN` | Run in dry-run mode | `false` |
 | `SBOMIFY_TOKEN` | sbomify API token for upload | - |
 | `GH_TOKEN` | GitHub token for API access | - |
+| `DOCKER_HUB_MIRROR` | Read-only Docker Hub mirror used by `check-updates.sh` (e.g. `mirror.gcr.io`) | - |
 
 ## GitHub Actions
 

@@ -40,8 +40,12 @@ sbomify SBOM Library — automates Software Bill of Materials (SBOM) extraction 
 # Debug logging
 LOG_LEVEL=DEBUG ./scripts/run.sh <app-name>
 
-# Lint
-shellcheck scripts/**/*.sh
+# Check for (and apply) upstream version bumps; --verify skips versions without a published SBOM
+./scripts/check-updates.sh --verify
+./scripts/check-updates.sh --verify --update
+
+# Lint (matches CI)
+shellcheck -x -S warning scripts/*.sh scripts/*/*.sh
 yamllint .
 ```
 
@@ -66,6 +70,13 @@ yamllint .
 - `DRY_RUN` — true/false
 - `SBOMIFY_TOKEN` — API token for sbomify upload
 - `GH_TOKEN` — GitHub API token
+- `DOCKER_HUB_MIRROR` — optional read-only Docker Hub mirror for `check-updates.sh` (e.g. `mirror.gcr.io`)
+
+## Keeping the Library Current
+
+The maintenance routine (audit, bump, verify, PR) is documented as a skill in
+`.claude/skills/update-library/SKILL.md`. Follow it for any "update the library" task and keep it in sync with
+changes to `scripts/check-updates.sh`.
 
 ## Required Tools
 
