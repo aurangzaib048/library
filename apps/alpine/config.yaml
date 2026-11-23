@@ -1,5 +1,5 @@
 name: alpine
-version: "3.23.3"
+version: "3.24.4"
 format: spdx
 
 source:

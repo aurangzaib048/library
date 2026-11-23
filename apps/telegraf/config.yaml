@@ -1,5 +1,5 @@
 name: telegraf
-version: "1.37.0"
+version: "1.40.3"
 format: spdx
 
 source:

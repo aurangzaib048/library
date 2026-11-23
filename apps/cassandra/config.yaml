@@ -1,5 +1,5 @@
 name: cassandra
-version: "5.0.6"
+version: "5.0.9"
 format: spdx
 
 source:

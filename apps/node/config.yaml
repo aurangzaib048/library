@@ -1,5 +1,5 @@
 name: node
-version: "25.0.0"
+version: "26.13.1"
 format: spdx
 
 source:

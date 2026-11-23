@@ -1,5 +1,5 @@
 name: rockylinux
-version: "9.3.20231119"
+version: "10.3.20261112"
 format: spdx
 source:
   type: docker

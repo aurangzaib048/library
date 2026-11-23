@@ -1,5 +1,5 @@
 name: bash
-version: "5.3.9"
+version: "5.3.20"
 format: spdx
 
 source:

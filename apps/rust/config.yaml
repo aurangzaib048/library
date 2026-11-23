@@ -1,5 +1,5 @@
 name: rust
-version: "1.93.1"
+version: "1.100.0"
 format: spdx
 source:
   type: docker

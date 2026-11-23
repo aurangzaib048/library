@@ -1,5 +1,5 @@
 name: eclipse-temurin
-version: "25.0.2_10-jdk-noble"
+version: "25.0.5.1_2-jdk-resolute"
 format: spdx
 
 source:

@@ -1,5 +1,5 @@
 name: solr
-version: "9.10.1"
+version: "10.1.0"
 format: spdx
 
 source:

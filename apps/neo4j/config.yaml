@@ -1,5 +1,5 @@
 name: neo4j
-version: "2026.01.4"
+version: "2026.10.2"
 format: spdx
 
 source:

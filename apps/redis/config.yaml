@@ -1,5 +1,5 @@
 name: redis
-version: "8.6.1"
+version: "8.10.3"
 format: spdx
 
 source:
